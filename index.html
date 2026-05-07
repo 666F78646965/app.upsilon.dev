@@ -286,4 +286,18 @@
 
         function createParticle(color, sizeMod){
             const p = document.createElement('div');
-            p.className = 'particl
+            p.className = 'particle';
+            const size = (Math.random()*4+2)*sizeMod;
+            p.style.width = `${size}px`;
+            p.style.height = `${size}px`;
+            p.style.left = Math.random()*100+'vw';
+            p.style.animationDuration = (Math.random()*4+5)+'s';
+            p.style.background = color;
+            document.getElementById('particles').appendChild(p);
+            setTimeout(() => p.remove(), 12000);
+        }
+
+        setTimeout(() => { document.getElementById('dialog').style.display = 'none'; }, 100);
+    </script>
+</body>
+</html>
