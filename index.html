@@ -79,8 +79,11 @@
     </div>
 
     <div class="matrix-rain" id="matrixRain"></div>
-
     <div class="particles" id="particles"></div>
+
+    <audio id="myAudio" loop>
+        <source src="raindrop.mp3" type="audio/mpeg">
+    </audio>
 
     <script>
         let audioCtx = null;
@@ -176,7 +179,23 @@
             commandsDiv.appendChild(s);
         }
 
-        // INIT COMMANDES
+        function fadeOutAudio() {
+            const audio = document.getElementById('myAudio');
+            const fadeTime = 1000; 
+            const step = 0.05;
+            const interval = fadeTime * step;
+            const fade = setInterval(() => {
+                if (audio.volume > step) {
+                    audio.volume -= step;
+                } else {
+                    audio.volume = 0;
+                    audio.pause();
+                    clearInterval(fade);
+                }
+            }, interval);
+        }
+
+        // INITIALIZE COMMANDS
         addCommand('⧫ grok_deltai', 'grok_deltai');
         addCommand('⧫ upsilon_apk', 'upsilon_apk');
         addCommand('⧫ upsilon_zip', 'upsilon_zip');
@@ -186,7 +205,7 @@
             addCommand('⧫ blue_pill', 'blue_pill');
         }, 17000);
 
-        // SAISIE + ENTER
+        // INPUT + ENTER
         document.getElementById('commandInput').addEventListener('keydown', (e) => {
             if(e.key === 'Enter'){
                 e.preventDefault();
@@ -196,7 +215,14 @@
             }
         });
 
-        // CLIC SUR COMMANDES
+        // KEYBOARD M TRIGGER
+        window.addEventListener('keydown', (e) => {
+            if (e.key.toLowerCase() === 'm' && document.activeElement.id !== 'commandInput') {
+                triggerAction('m');
+            }
+        });
+
+        // CLICK ON COMMANDS
         document.getElementById('commandsList').addEventListener('click', (e) => {
             if(e.target.classList.contains('command')){
                 playCommandClick();
@@ -207,7 +233,19 @@
         function triggerAction(action){
             initAudio();
             playCommandClick();
-            if(action === 'red_pill'){
+            const audio = document.getElementById('myAudio');
+
+            if(action === 'm'){
+                if(audio.paused){
+                    audio.volume = 1;
+                    audio.play().catch(()=>{});
+                } else {
+                    audio.pause();
+                }
+            }
+            else if(action === 'red_pill'){
+                audio.volume = 1;
+                audio.play().catch(()=>{});
                 redPillCount++;
                 if(redPillCount === 1) enterMatrixMode();
                 else if(redPillCount <= 3) increaseDensity();
@@ -217,6 +255,7 @@
                 }
             }
             else if(action === 'blue_pill'){
+                fadeOutAudio();
                 inMatrixMode = false; rainDensity = 1; redPillCount = 0;
                 stopMatrix();
             }
@@ -233,11 +272,9 @@
                     const foxSpan = Array.from(document.querySelectorAll('.command')).find(s => s.dataset.action === 'foxdie_digital');
                     if(foxdieClicks === 2 && foxSpan){
                         foxSpan.textContent = '🦠 foxdie_digital';
-                        // Permanent green theme
                         document.documentElement.style.setProperty('--neon-primary', '#01ee70');
                         document.documentElement.style.setProperty('--neon-secondary', '#1ee700');
                         document.documentElement.style.setProperty('--matrix-color', '#01ee70');
-                        // Add green particles
                         for(let i = 0; i < 20; i++){
                             createParticle('#01ee70', 1.5);
                         }
@@ -277,7 +314,7 @@
             d.innerHTML = `
                 <div style="background:#0a0a1a;border:2px solid #00d4ff;padding:30px;max-width:500px;color:#00eaff;font-family:'Courier New',monospace;text-align:center;box-shadow:0 0 40px rgba(0,212,255,0.4);border-radius:4px;">
                     <div style="font-size:24px;margin-bottom:20px;">ENTER THE MATRIX ARCADE?</div>
-                    <button onclick="window.open('https://game.upsilon.dev','_blank');this.parentElement.parentElement.remove()" style="background:transparent;border:1px solid #00d4ff;color:#00eaff;padding:12px 32px;font-family:'Courier New',monospace;cursor:pointer;margin:10px;">PLAY</button>
+                    <button onclick="window.open('https://games.upsilon.dev','_blank');this.parentElement.parentElement.remove()" style="background:transparent;border:1px solid #00d4ff;color:#00eaff;padding:12px 32px;font-family:'Courier New',monospace;cursor:pointer;margin:10px;">PLAY</button>
                     <button onclick="this.parentElement.parentElement.remove()" style="background:transparent;border:1px solid #ff0066;color:#ff0066;padding:12px 32px;font-family:'Courier New',monospace;cursor:pointer;margin:10px;">CANCEL</button>
                 </div>
             `;
