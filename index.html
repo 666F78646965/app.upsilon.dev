@@ -337,20 +337,25 @@
         setTimeout(() => { document.getElementById('dialog').style.display = 'none'; }, 100);
     </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@widgetbot/crate@3" async defer>
+<script src="https://cdn.jsdelivr.net/npm/@widgetbot/crate@3" async defer></script>
+
+<script>
     window.addEventListener('load', () => {
         setTimeout(() => {
-            new Crate({
-                server: '1504531204010152178',
-                channel: '1504531205150871785',
-                glyph: ["data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50%25' y='55%25' font-family='monospace' font-size='18' fill='white' text-anchor='middle' dominant-baseline='middle' font-weight='bold'%3Ediscord%3C/text%3E%3C/svg%3E", '100%'],
-                color: 'transparent',
-                location: [20, 20]
-            });
+            
+            if (typeof Crate !== 'undefined') {
+                new Crate({
+                    server: '1504531204010152178',
+                    channel: '1504531205150871785',
+                    glyph: ["data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50%25' y='55%25' font-family='monospace' font-size='18' fill='white' text-anchor='middle' dominant-baseline='middle' font-weight='bold'%3Ediscord%3C/text%3E%3C/svg%3E", '100%'],
+                    color: 'transparent'
+                });
+            }
 
             const s = document.createElement('style');
             s.innerHTML = `
-                #crate, .crate-instance, .crate-button-container {
+                /* Ciblage agressif pour forcer l'affichage en haut à gauche */
+                #crate, .crate-instance, div[class^="crate-"] {
                     z-index: 999999 !important;
                     position: fixed !important;
                     top: 10px !important;
@@ -370,16 +375,13 @@
                     box-shadow: 0 0 15px rgba(0, 229, 255, 0.6) !important;
                     backdrop-filter: blur(4px) !important;
                 }
-                .crate-button img {
-                    transform: scale(1.1) !important;
-                }
                 @media (max-width: 600px) {
                     #crate, .crate-instance { top: 5px !important; left: 5px !important; }
                     .crate-button { width: 42px !important; height: 42px !important; }
                 }
             `;
             document.head.appendChild(s);
-        }, 3000);
+        }, 3000); 
     });
 </script></body>
 </html>
