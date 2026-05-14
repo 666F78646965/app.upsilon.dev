@@ -340,29 +340,42 @@
 <script src="https://cdn.jsdelivr.net/npm/@widgetbot/crate@3" async defer>
     window.addEventListener('load', () => {
         setTimeout(() => {
-            const crate = new Crate({
+            new Crate({
                 server: '1504531204010152178',
                 channel: '1504531205150871785',
                 glyph: ["data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50%25' y='55%25' font-family='monospace' font-size='18' fill='white' text-anchor='middle' dominant-baseline='middle' font-weight='bold'%3Ediscord%3C/text%3E%3C/svg%3E", '100%'],
                 color: 'transparent',
-                location: [20, 20],
+                location: [-10, 10],
                 defer: true
             });
 
             const style = document.createElement('style');
             style.innerHTML = `
-                div#crate {
-                    z-index: 10000 !important;
+                div#crate, iframe.crate-instance {
+                    z-index: 99999 !important;
+                    top: 5px !important;
+                    left: 5px !important;
+                    bottom: auto !important;
+                    right: auto !important;
+                    position: fixed !important;
                 }
                 .crate-button {
+                    width: 50px !important;
+                    height: 50px !important;
                     transform: rotate(45deg) !important;
                     border: 2px solid #00e5ff !important;
                     background: rgba(0, 229, 255, 0.2) !important;
                     border-radius: 0% !important;
                     box-shadow: 0 0 15px rgba(0, 229, 255, 0.6) !important;
+                    backdrop-filter: blur(4px);
                 }
                 .crate-button img {
-                    transform: scale(1.2) !important;
+                    transform: scale(1.1) !important;
+                    filter: drop-shadow(0 0 2px #fff);
+                }
+                @media (max-width: 600px) {
+                    div#crate { top: 8px !important; left: 8px !important; }
+                    .crate-button { width: 40px !important; height: 40px !important; }
                 }
             `;
             document.head.appendChild(style);
