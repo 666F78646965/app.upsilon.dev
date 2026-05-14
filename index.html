@@ -341,34 +341,32 @@
     window.addEventListener('load', () => {
         setTimeout(() => {
             const crate = new Crate({
-                server: '1504531204010152178', 
+                server: '1504531204010152178',
                 channel: '1504531205150871785',
-                // SVG data-uri avec le texte "discord" en monospace
                 glyph: ["data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50%25' y='55%25' font-family='monospace' font-size='18' fill='white' text-anchor='middle' dominant-baseline='middle' font-weight='bold'%3Ediscord%3C/text%3E%3C/svg%3E", '100%'],
-                color: 'transparent', // Géré par le CSS
-                location: [-110, 20], // Position ajustée
+                color: 'transparent',
+                location: [20, 20],
                 defer: true
             });
 
-            // Injection du style Losange
             const style = document.createElement('style');
             style.innerHTML = `
-                /* Cible le bouton du widget */
-                .crate-button {
-                    transform: rotate(45deg) !important; /* Rotation en losange */
-                    border: 2px solid #00e5ff !important; /* Bordure opaque */
-                    background: rgba(0, 229, 255, 0.2) !important; /* Centre translucide */
-                    border-radius: 0% !important; /* Retire le cercle */
-                    box-shadow: 0 0 15px rgba(0, 229, 255, 0.6) !important; /* Lueur néon */
+                div#crate {
+                    z-index: 10000 !important;
                 }
-                /* Le texte (glyph) reste incliné avec le losange */
+                .crate-button {
+                    transform: rotate(45deg) !important;
+                    border: 2px solid #00e5ff !important;
+                    background: rgba(0, 229, 255, 0.2) !important;
+                    border-radius: 0% !important;
+                    box-shadow: 0 0 15px rgba(0, 229, 255, 0.6) !important;
+                }
                 .crate-button img {
-                    /* On retire la rotation inverse, on garde juste le scale */
                     transform: scale(1.2) !important;
                 }
             `;
             document.head.appendChild(style);
-        }, 3000); 
-    })
+        }, 3000);
+    });
 </script></body>
 </html>
