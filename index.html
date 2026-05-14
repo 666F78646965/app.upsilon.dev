@@ -337,51 +337,48 @@
         setTimeout(() => { document.getElementById('dialog').style.display = 'none'; }, 100);
     </script>
 
+
 <script src="https://cdn.jsdelivr.net/npm/@widgetbot/crate@3" async defer></script>
+
 
 <script>
     window.addEventListener('load', () => {
         setTimeout(() => {
-            
             if (typeof Crate !== 'undefined') {
                 new Crate({
                     server: '1504531204010152178',
                     channel: '1504531205150871785',
                     glyph: ["data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50%25' y='55%25' font-family='monospace' font-size='18' fill='white' text-anchor='middle' dominant-baseline='middle' font-weight='bold'%3Ediscord%3C/text%3E%3C/svg%3E", '100%'],
-                    color: 'transparent'
+                    color: 'rgba(0, 229, 255, 0.5)' // On met une couleur visible pour le test
                 });
-            }
 
-            const s = document.createElement('style');
-            s.innerHTML = `
-                /* Ciblage agressif pour forcer l'affichage en haut à gauche */
-                #crate, .crate-instance, div[class^="crate-"] {
-                    z-index: 999999 !important;
-                    position: fixed !important;
-                    top: 10px !important;
-                    left: 10px !important;
-                    bottom: auto !important;
-                    right: auto !important;
-                    display: block !important;
-                    visibility: visible !important;
-                }
-                .crate-button {
-                    width: 50px !important;
-                    height: 50px !important;
-                    transform: rotate(45deg) !important;
-                    border: 2px solid #00e5ff !important;
-                    background: rgba(0, 229, 255, 0.2) !important;
-                    border-radius: 0% !important;
-                    box-shadow: 0 0 15px rgba(0, 229, 255, 0.6) !important;
-                    backdrop-filter: blur(4px) !important;
-                }
-                @media (max-width: 600px) {
-                    #crate, .crate-instance { top: 5px !important; left: 5px !important; }
-                    .crate-button { width: 42px !important; height: 42px !important; }
-                }
-            `;
-            document.head.appendChild(s);
-        }, 3000); 
+                const style = document.createElement('style');
+                style.innerHTML = `
+                    /* On cible absolument tout ce qui appartient au widget */
+                    #crate, .crate-instance, [class^="crate-"] {
+                        display: block !important;
+                        visibility: visible !important;
+                        opacity: 1 !important;
+                        z-index: 999999 !important;
+                        position: fixed !important;
+                        bottom: 20px !important; /* On le remet en bas à droite pour tester */
+                        right: 20px !important;
+                        left: auto !important;
+                        top: auto !important;
+                    }
+                    .crate-button {
+                        width: 60px !important;
+                        height: 60px !important;
+                        transform: rotate(45deg) !important;
+                        border: 2px solid #00e5ff !important;
+                        background: #000 !important; /* Fond noir pour trancher */
+                        border-radius: 0% !important;
+                        box-shadow: 0 0 20px #00e5ff !important;
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+        }, 4000); 
     });
 </script></body>
 </html>
