@@ -85,6 +85,8 @@
         <source src="raindrop.mp3" type="audio/mpeg">
     </audio>
 
+    <input type="color" id="themeColorPicker" style="display:none;">
+
     <script>
         let audioCtx = null;
         let matrixContainer = null;
@@ -97,6 +99,7 @@
         let originalNeonPrimary = '#00d4ff';
         let originalNeonSecondary = '#00eaff';
         let foxdieAdded = false;
+        let matrixxxTerminalAdded = false;
 
         function initAudio(){if(audioCtx)return;audioCtx=new(window.AudioContext||window.webkitAudioContext)();}
         function playBeep(freq,duration,vol=0.22,type='sawtooth',detune=0){initAudio();const t=audioCtx.currentTime;const osc=audioCtx.createOscillator(),gain=audioCtx.createGain(),filter=audioCtx.createBiquadFilter();osc.type=type;osc.frequency.setValueAtTime(freq,t);osc.detune.setValueAtTime(detune,t);filter.type='lowpass';filter.frequency.setValueAtTime(2600,t);gain.gain.setValueAtTime(vol,t);gain.gain.exponentialRampToValueAtTime(0.001,t+duration/1000);osc.connect(filter).connect(gain).connect(audioCtx.destination);osc.start(t);osc.stop(t+duration/1000);}
@@ -199,6 +202,8 @@
         addCommand('⧫ grok_deltai', 'grok_deltai');
         addCommand('⧫ upsilon_apk', 'upsilon_apk');
         addCommand('⧫ upsilon_zip', 'upsilon_zip');
+        addCommand('⧫ open_discord', 'open_discord');
+        addCommand('⧫ close_discord', 'close_discord');
 
         setTimeout(() => {
             addCommand('⧫ red_pill', 'red_pill');
@@ -209,7 +214,7 @@
         document.getElementById('commandInput').addEventListener('keydown', (e) => {
             if(e.key === 'Enter'){
                 e.preventDefault();
-                const command = e.target.value.trim().toLowerCase().replace('⧫ ','').replace('★ ','');
+                const command = e.target.value.trim().toLowerCase().replace('⧫ ','').replace('★ ','').replace('🔞 ','').replace('🍑 ','').replace('🎨 ','');
                 if(command) triggerAction(command);
                 e.target.value = '';
             }
@@ -228,6 +233,14 @@
                 playCommandClick();
                 triggerAction(e.target.dataset.action);
             }
+        });
+
+        // COLOR PICKER LISTENER
+        document.getElementById('themeColorPicker').addEventListener('input', (e) => {
+            const color = e.target.value;
+            document.documentElement.style.setProperty('--neon-primary', color);
+            document.documentElement.style.setProperty('--neon-secondary', color);
+            document.documentElement.style.setProperty('--matrix-color', color);
         });
 
         function triggerAction(action){
@@ -306,16 +319,62 @@
             else if(action === 'upsilon_zip'){
                 if(confirm('Download upsilon.zip from https://1337.nexus/upsilon/zip ?')) window.open('https://1337.nexus/upsilon/zip', '_blank');
             }
+            else if(action === 'open_discord'){
+                document.getElementById('discord-widget-container').style.display = 'block';
+            }
+            else if(action === 'close_discord'){
+                document.getElementById('discord-widget-container').style.display = 'none';
+            }
+            else if(action === 'enter_the_matrixxx'){
+                window.open('https://enter.the.matrixxx', '_blank');
+            }
+            else if(action === 'matrixxx_terminal'){
+                if(!matrixxxTerminalAdded){
+                    addCommand('🔞 matrixxx_terminal', 'matrixxx_terminal');
+                    matrixxxTerminalAdded = true;
+                } else {
+                    showMatrixxxDialog();
+                }
+            }
+            else if(action === 'debug_settings'){
+                addCommand('⧫ red_pill', 'red_pill');
+                addCommand('⧫ blue_pill', 'blue_pill');
+                addCommand('⧫ enter_the_matrixxx', 'enter_the_matrixxx');
+                addCommand('🎨 colour_picker', 'colour_picker');
+                if(!matrixxxTerminalAdded){
+                    addCommand('🍑 matrixxx_terminal', 'matrixxx_terminal');
+                    matrixxxTerminalAdded = true;
+                } else {
+                    const matrixxxSpan = Array.from(document.querySelectorAll('.command')).find(s => s.dataset.action === 'matrixxx_terminal');
+                    if(matrixxxSpan) matrixxxSpan.textContent = '🍑 matrixxx_terminal';
+                }
+            }
+            else if(action === 'colour_picker'){
+                document.getElementById('themeColorPicker').click();
+            }
         }
 
         function showArcadeDialog(){
             const d = document.createElement('div');
             d.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.92);display:flex;justify-content:center;align-items:center;z-index:40;';
             d.innerHTML = `
-                <div style="background:#0a0a1a;border:2px solid #00d4ff;padding:30px;max-width:500px;color:#00eaff;font-family:'Courier New',monospace;text-align:center;box-shadow:0 0 40px rgba(0,212,255,0.4);border-radius:4px;">
+                <div style="background:#0a0a1a;border:2px solid var(--neon-primary);padding:30px;max-width:500px;color:var(--neon-secondary);font-family:'Courier New',monospace;text-align:center;box-shadow:0 0 40px var(--neon-primary);border-radius:4px;">
                     <div style="font-size:24px;margin-bottom:20px;">ENTER THE MATRIX ARCADE?</div>
-                    <button onclick="window.open('https://games.upsilon.dev','_blank');this.parentElement.parentElement.remove()" style="background:transparent;border:1px solid #00d4ff;color:#00eaff;padding:12px 32px;font-family:'Courier New',monospace;cursor:pointer;margin:10px;">PLAY</button>
+                    <button onclick="window.open('https://games.upsilon.dev','_blank');this.parentElement.parentElement.remove()" style="background:transparent;border:1px solid var(--neon-primary);color:var(--neon-secondary);padding:12px 32px;font-family:'Courier New',monospace;cursor:pointer;margin:10px;">PLAY</button>
                     <button onclick="this.parentElement.parentElement.remove()" style="background:transparent;border:1px solid #ff0066;color:#ff0066;padding:12px 32px;font-family:'Courier New',monospace;cursor:pointer;margin:10px;">CANCEL</button>
+                </div>
+            `;
+            document.body.appendChild(d);
+        }
+
+        function showMatrixxxDialog(){
+            const d = document.createElement('div');
+            d.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.92);display:flex;justify-content:center;align-items:center;z-index:40;';
+            d.innerHTML = `
+                <div style="background:#0a0a1a;border:2px solid var(--neon-primary);padding:30px;max-width:500px;color:var(--neon-secondary);font-family:'Courier New',monospace;text-align:center;box-shadow:0 0 40px var(--neon-primary);border-radius:4px;">
+                    <div style="font-size:24px;margin-bottom:20px;">ENTER THE MATRIXXX ?</div>
+                    <button onclick="window.open('https://matri.xxx','_blank');this.parentElement.parentElement.remove()" style="background:transparent;border:1px solid var(--neon-primary);color:var(--neon-secondary);padding:12px 32px;font-family:'Courier New',monospace;cursor:pointer;margin:10px;">🔵 YES</button>
+                    <button onclick="this.parentElement.parentElement.remove()" style="background:transparent;border:1px solid #ff0066;color:#ff0066;padding:12px 32px;font-family:'Courier New',monospace;cursor:pointer;margin:10px;">🔴 NO</button>
                 </div>
             `;
             document.body.appendChild(d);
@@ -338,7 +397,7 @@
     </script>
 
 
-<div id="discord-widget-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999;">
+<div id="discord-widget-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: none;">
     <iframe 
         src="https://discord.com/widget?id=1504531204010152178&theme=dark" 
         width="350" 
