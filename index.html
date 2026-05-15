@@ -59,7 +59,7 @@
         </defs>
         <text x="380" y="480" font-family="system-ui,-apple-system,sans-serif" font-size="680" font-weight="900" fill="#222222" text-anchor="middle" dominant-baseline="middle" filter="url(#shadow)">𝕏</text>
         <g transform="translate(820,400)" filter="url(#neon)"><text font-family="system-ui,-apple-system,sans-serif" font-size="180" font-weight="800" text-anchor="middle" dominant-baseline="middle"><tspan fill="#00d4ff" class="glow">-</tspan><tspan fill="#444444">risk</tspan><tspan fill="#00d4ff" class="glow">/</tspan></text></g>
-        <g transform="translate(600,780)" filter="url(#neon)"><text id="grokText" font-family="system-ui,-apple-system,sans-serif" font-size="140" font-weight="800" text-anchor="middle" dominant-baseline="middle" letter-spacing="12" fill="#00d4ff" class="glow">GROK</text>
+        <g transform="translate(600,780)" filter="url(#neon)"><text id="grokText" font-family="system-ui,-apple-system,sans-serif" font-size="140" font-weight="800" text-anchor="middle" dominant-baseline="middle" letter-spacing="12" fill="#00d4ff" class="glow" onclick="handleGrokClick()" style="cursor:pointer; user-select:none;">GROK</text>
             <g>
                 <path class="wave" d="M -380 -140 Q -190 -280 0 -140 T 380 -140"><animate attributeName="d" values="M -380 -140 Q -190 -280 0 -140 T 380 -140;M -380 -100 Q -190 -360 0 -100 T 380 -100;M -380 -140 Q -190 -280 0 -140 T 380 -140" dur="2.5s" repeatCount="indefinite" calcMode="linear"/></path>
                 <path class="wave" d="M -340 -100 Q -170 -240 0 -100 T 340 -100" begin="0.3s"><animate attributeName="d" values="M -340 -100 Q -170 -240 0 -100 T 340 -100;M -340 -60 Q -170 -320 0 -60 T 340 -60;M -340 -100 Q -170 -240 0 -100 T 340 -100" dur="2.8s" repeatCount="indefinite" calcMode="linear"/></path>
@@ -100,6 +100,12 @@
         let originalNeonSecondary = '#00eaff';
         let foxdieAdded = false;
         let matrixxxTerminalAdded = false;
+        let bigshellAdded = false;
+        let debugMode = false;
+        let matrixxxState = 0; 
+        let grokClicks = 0;
+        let networkToggleState = false;
+        let networkInterval = null;
 
         function initAudio(){if(audioCtx)return;audioCtx=new(window.AudioContext||window.webkitAudioContext)();}
         function playBeep(freq,duration,vol=0.22,type='sawtooth',detune=0){initAudio();const t=audioCtx.currentTime;const osc=audioCtx.createOscillator(),gain=audioCtx.createGain(),filter=audioCtx.createBiquadFilter();osc.type=type;osc.frequency.setValueAtTime(freq,t);osc.detune.setValueAtTime(detune,t);filter.type='lowpass';filter.frequency.setValueAtTime(2600,t);gain.gain.setValueAtTime(vol,t);gain.gain.exponentialRampToValueAtTime(0.001,t+duration/1000);osc.connect(filter).connect(gain).connect(audioCtx.destination);osc.start(t);osc.stop(t+duration/1000);}
@@ -198,6 +204,64 @@
             }, interval);
         }
 
+        function handleGrokClick() {
+            if (debugMode || psychoCount >= 10) return;
+            if (matrixxxState === 1) {
+                matrixxxState = 2;
+                grokClicks = 0;
+                updateGrokText();
+                updateMatrixxxMenu();
+            } else if (matrixxxState === 2) {
+                grokClicks++;
+                if (grokClicks >= 3) {
+                    matrixxxState = 3;
+                    updateGrokText();
+                    updateMatrixxxMenu();
+                }
+            }
+        }
+
+        function updateGrokText() {
+            const grokText = document.getElementById('grokText');
+            if (!grokText) return;
+            if (psychoCount >= 10) {
+                grokText.textContent = 'MANTIS';
+                return;
+            }
+            if (debugMode) {
+                grokText.textContent = 'GROK';
+                return;
+            }
+            if (matrixxxState === 1) grokText.textContent = 'GR🔞K';
+            else if (matrixxxState === 2) grokText.textContent = 'GR🍑K';
+            else if (matrixxxState === 3) grokText.textContent = 'GR🧻K';
+            else grokText.textContent = 'GROK';
+        }
+
+        function updateMatrixxxMenu() {
+            const spans = document.querySelectorAll('.command');
+            let span = Array.from(spans).find(s => s.dataset.action === 'matrixxx_terminal');
+            if (!span) return;
+            if (matrixxxState === 1) span.textContent = '🔞 matrixxx_terminal';
+            else if (matrixxxState === 2) span.textContent = '🍑 matrixxx_terminal';
+            else if (matrixxxState === 3) span.textContent = '🧻 matrixxx_terminal';
+        }
+
+        function startNetworkInterval() {
+            if (networkInterval) clearInterval(networkInterval);
+            networkInterval = setInterval(() => {
+                const span = Array.from(document.querySelectorAll('.command')).find(s => s.dataset.action === 'bigshell_network');
+                if (span) {
+                    if (inMatrixMode) {
+                        networkToggleState = !networkToggleState;
+                        span.textContent = networkToggleState ? '⬣ bigshell_network' : '⬢ bigshell_network';
+                    } else {
+                        span.textContent = '⬢ bigshell_network';
+                    }
+                }
+            }, 500);
+        }
+
         // INITIALIZE COMMANDS
         addCommand('⧫ grok_deltai', 'grok_deltai');
         addCommand('⧫ upsilon_apk', 'upsilon_apk');
@@ -214,7 +278,18 @@
         document.getElementById('commandInput').addEventListener('keydown', (e) => {
             if(e.key === 'Enter'){
                 e.preventDefault();
-                const command = e.target.value.trim().toLowerCase().replace('⧫ ','').replace('★ ','').replace('🔞 ','').replace('🍑 ','').replace('🎨 ','');
+                const rawVal = e.target.value.trim();
+                if(rawVal === 'dev0ne'){
+                    addCommand('★ debug_settings', 'debug_settings');
+                    addCommand('★ psycho_mantis', 'psycho_mantis');
+                    e.target.value = '';
+                    playCommandClick();
+                    return;
+                }
+                const command = rawVal.toLowerCase()
+                    .replace('⧫ ','').replace('★ ','')
+                    .replace('🔞 ','').replace('🍑 ','').replace('🧻 ','')
+                    .replace('🎨 ','').replace('⬡ ','').replace('⬢ ','').replace('⬣ ','');
                 if(command) triggerAction(command);
                 e.target.value = '';
             }
@@ -301,14 +376,28 @@
             }
             else if(action === 'psycho_mantis'){
                 psychoCount++;
+                if(psychoCount === 1 && !bigshellAdded){
+                    addCommand('⬡ bigshell_channel', 'bigshell_channel');
+                    addCommand('⬡ bigshell_group', 'bigshell_group');
+                    bigshellAdded = true;
+                }
                 if(psychoCount >= 7 && psychoCount <= 9){
                     document.body.classList.add('electric-flash');
                     setTimeout(() => document.body.classList.remove('electric-flash'), 200);
                 }
                 if(psychoCount === 10){
-                    const grokText = document.getElementById('grokText');
-                    if(grokText) grokText.textContent = 'MANTIS';
+                    updateGrokText();
+                    const ch = Array.from(document.querySelectorAll('.command')).find(s => s.dataset.action === 'bigshell_channel');
+                    if(ch) ch.textContent = '⬢ bigshell_channel';
+                    const gr = Array.from(document.querySelectorAll('.command')).find(s => s.dataset.action === 'bigshell_group');
+                    if(gr) gr.textContent = '⬢ bigshell_group';
                 }
+            }
+            else if(action === 'bigshell_channel'){
+                if(psychoCount >= 10) window.open('https://bigshell.channel', '_blank');
+            }
+            else if(action === 'bigshell_group'){
+                if(psychoCount >= 10) window.open('https://bigshell.group', '_blank');
             }
             else if(action === 'grok_deltai'){
                 window.open('https://x.com/grok_deltai', '_blank');
@@ -330,24 +419,40 @@
             }
             else if(action === 'matrixxx_terminal'){
                 if(!matrixxxTerminalAdded){
+                    matrixxxState = 1;
                     addCommand('🔞 matrixxx_terminal', 'matrixxx_terminal');
                     matrixxxTerminalAdded = true;
+                    updateGrokText();
                 } else {
                     showMatrixxxDialog();
                 }
             }
             else if(action === 'debug_settings'){
+                debugMode = true;
+                updateGrokText();
                 addCommand('⧫ red_pill', 'red_pill');
                 addCommand('⧫ blue_pill', 'blue_pill');
                 addCommand('⧫ enter_the_matrixxx', 'enter_the_matrixxx');
                 addCommand('🎨 colour_picker', 'colour_picker');
+                addCommand('cloud_2077', 'cloud_2077');
+                addCommand('⬢ bigshell_network', 'bigshell_network');
+                
+                startNetworkInterval();
+
                 if(!matrixxxTerminalAdded){
+                    matrixxxState = 2;
                     addCommand('🍑 matrixxx_terminal', 'matrixxx_terminal');
                     matrixxxTerminalAdded = true;
                 } else {
-                    const matrixxxSpan = Array.from(document.querySelectorAll('.command')).find(s => s.dataset.action === 'matrixxx_terminal');
-                    if(matrixxxSpan) matrixxxSpan.textContent = '🍑 matrixxx_terminal';
+                    if(matrixxxState === 1) matrixxxState = 2;
+                    updateMatrixxxMenu();
                 }
+            }
+            else if(action === 'cloud_2077'){
+                window.open('https://2077.cloud', '_blank');
+            }
+            else if(action === 'bigshell_network'){
+                window.open('https://bigshell.network', '_blank');
             }
             else if(action === 'colour_picker'){
                 document.getElementById('themeColorPicker').click();
@@ -395,7 +500,6 @@
 
         setTimeout(() => { document.getElementById('dialog').style.display = 'none'; }, 100);
     </script>
-
 
 <div id="discord-widget-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: none;">
     <iframe 
